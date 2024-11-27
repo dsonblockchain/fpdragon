@@ -1,4 +1,4 @@
 streamlit==1.25.0
 cohere==2.0.0
 hnswlib==0.6.2
-unstructured==0.5.0
+unstructured
