@@ -178,7 +178,7 @@ vectorstore = st.session_state.vectorstore
 
 
 # Define avatar images with different sizes
-USER_AVATAR = r"/mount/src/fpdragon/static/fpuser.png"
+USER_AVATAR = st.image(r"/mount/src/fpdragon/static/fpuser.png")
 BOT_AVATAR = r"/mount/src/fpdragon/static/fpdragon.png"
 
 # Add this near the top of your script
