@@ -6,7 +6,6 @@ from typing import List, Dict
 from unstructured.partition.html import partition_html
 from unstructured.chunking.title import chunk_by_title
 import base64
-from PIL import Image
 import io
 
 # Initialize Cohere client
@@ -176,18 +175,11 @@ if 'vectorstore' not in st.session_state:
 
 # Use the stored vectorstore instead of creating a new one
 vectorstore = st.session_state.vectorstore
-def get_image_base64(image_path, size=(60, 60)):  # Default size is 60x60 pixels
-    """Convert an image to base64 string with specified size"""
-    img = Image.open(image_path)
-    img = img.resize(size)
-    buffered = io.BytesIO()
-    img.save(buffered, format="PNG")
-    img_str = base64.b64encode(buffered.getvalue()).decode()
-    return f"data:image/png;base64,{img_str}"
+
 
 # Define avatar images with different sizes
-USER_AVATAR = get_image_base64("fpuser.png", (30, 30))      # Normal size
-BOT_AVATAR = get_image_base64("fpdragon.png", (60, 60))       # Double size
+USER_AVATAR = "fpuser.png"  # Replace with your image path or URL
+BOT_AVATAR = "fpdragon.png"  # Replace with your image path or URL
 
 # Add this near the top of your script
 st.markdown("""
