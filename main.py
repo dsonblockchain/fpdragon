@@ -7,7 +7,7 @@ from unstructured.partition.html import partition_html
 from unstructured.chunking.title import chunk_by_title
 import base64
 import io
-
+import os
 # Initialize Cohere client
 cohere_key = st.secrets["api"]
 co = cohere.Client(cohere_key)
@@ -241,3 +241,5 @@ if prompt := st.chat_input("Ask something about Frenpet:"):
         st.session_state.chat_history = updated_history
 
 
+st.write("Image path for USER_AVATAR:", os.path.abspath("static/fpuser.png"))
+st.write("Image path for BOT_AVATAR:", os.path.abspath("static/fpdragon.png"))
