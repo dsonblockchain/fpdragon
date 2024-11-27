@@ -10,7 +10,7 @@ from PIL import Image
 import io
 
 # Initialize Cohere client
-cohere_key = "6AL4P3e1oGFgF01LZe5LqWVnqxEaNfzekHr2tLKX"
+cohere_key = st.secrets["api"]
 co = cohere.Client(cohere_key)
 
 # Raw documents
