@@ -226,13 +226,11 @@ if prompt := st.chat_input("Ask something about Frenpet:"):
     })
     
     # Display user message
-    with st.chat_message("user", avatar=None):
-        st.image(USER_AVATAR)  # Display the user avatar image
-        st.markdown(prompt)  # Display the user message
+    with st.chat_message("user", avatar=USER_AVATAR):
+        st.markdown(prompt)
     
     # Get bot response
-    with st.chat_message("assistant", avatar=None):
-        st.image(BOT_AVATAR)  # Display the bot avatar image
+    with st.chat_message("assistant", avatar=BOT_AVATAR):
         chatbot_response, updated_history = run_chatbot(
             prompt, 
             st.session_state.chat_history
