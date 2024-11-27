@@ -240,4 +240,7 @@ if prompt := st.chat_input("Ask something about Frenpet:"):
         # Update chat history
         st.session_state.chat_history = updated_history
 
+st.write(f"User Avatar Path: {USER_AVATAR}")
+st.write(f"Bot Avatar Path: {BOT_AVATAR}")
+
 
