@@ -178,8 +178,8 @@ vectorstore = st.session_state.vectorstore
 
 
 # Define avatar images with different sizes
-USER_AVATAR = "fpuser.png"  # Replace with your image path or URL
-BOT_AVATAR = "fpdragon.png"  # Replace with your image path or URL
+USER_AVATAR = r"fpuser.png"  # Replace with your image path or URL
+BOT_AVATAR = r"fpdragon.png"  # Replace with your image path or URL
 
 # Add this near the top of your script
 st.markdown("""
