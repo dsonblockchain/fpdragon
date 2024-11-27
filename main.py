@@ -11,7 +11,7 @@ import os
 # Initialize Cohere client
 cohere_key = st.secrets["api"]
 co = cohere.Client(cohere_key)
-
+st.sidebar.image(r"cooldragons.png", use_column_width=True)
 # Raw documents
 raw_documents = [
     {"title": "FrenpetBranding", "url": "https://docs.frenpet.xyz/branding"},
