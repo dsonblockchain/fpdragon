@@ -243,4 +243,7 @@ if prompt := st.chat_input("Ask something about Frenpet:"):
 
 
 st.sidebar.image(r"cooldragons.png", use_column_width=True)
+st.sidebar.image(r"cooldragons.png", use_column_width=True)
+st.sidebar.image(r"cooldragons.png", use_column_width=True)
+
 
