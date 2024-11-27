@@ -203,7 +203,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # Streamlit app layout (Updated to resemble ChatGPT UI)
-st.title("FP Dragon the Onboarder")
+st.title("FP Dragon Chat")
 
 # Initialize chat history in session state
 if 'chat_history' not in st.session_state:
