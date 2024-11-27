@@ -178,8 +178,8 @@ vectorstore = st.session_state.vectorstore
 
 
 # Define avatar images with different sizes
-USER_AVATAR = r'static/fpuser.png'
-BOT_AVATAR = "fpdragon.png"
+USER_AVATAR = "/mount/src/fpdragon/static/fpuser.png"
+BOT_AVATAR = "/mount/src/fpdragon/static/fpdragon.png"
 
 # Add this near the top of your script
 st.markdown("""
