@@ -241,5 +241,3 @@ if prompt := st.chat_input("Ask something about Frenpet:"):
         st.session_state.chat_history = updated_history
 
 
-st.write("Image path for USER_AVATAR:", os.path.abspath("static/fpuser.png"))
-st.write("Image path for BOT_AVATAR:", os.path.abspath("static/fpdragon.png"))
