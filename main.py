@@ -226,11 +226,11 @@ if prompt := st.chat_input("Ask something about Frenpet:"):
     })
     
     # Display user message
-    with st.chat_message("user", avatar=USER_AVATAR):
+    with st.chat_message("user", avatar=None):
         st.markdown(prompt)
     
     # Get bot response
-    with st.chat_message("assistant", avatar=BOT_AVATAR):
+    with st.chat_message("assistant", avatar=None):
         chatbot_response, updated_history = run_chatbot(
             prompt, 
             st.session_state.chat_history
@@ -240,7 +240,5 @@ if prompt := st.chat_input("Ask something about Frenpet:"):
         # Update chat history
         st.session_state.chat_history = updated_history
 
-st.write(f"User Avatar Path: {USER_AVATAR}")
-st.write(f"Bot Avatar Path: {BOT_AVATAR}")
 
 
