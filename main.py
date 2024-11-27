@@ -179,7 +179,7 @@ vectorstore = st.session_state.vectorstore
 
 # Define avatar images with different sizes
 USER_AVATAR = r'static/fpuser.png'
-BOT_AVATAR = st.image("fpdragon.png")
+BOT_AVATAR = "fpdragon.png"
 
 # Add this near the top of your script
 st.markdown("""
@@ -240,5 +240,6 @@ if prompt := st.chat_input("Ask something about Frenpet:"):
         # Update chat history
         st.session_state.chat_history = updated_history
 
-st.image("fpdragon.png")
+st.sidebar:
+    st.image("fpdragon.png")
 
