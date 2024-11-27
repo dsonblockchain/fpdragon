@@ -178,7 +178,7 @@ vectorstore = st.session_state.vectorstore
 
 
 # Define avatar images with different sizes
-USER_AVATAR = ("fpuser.png")
+USER_AVATAR = (r"fpuser.png")
 BOT_AVATAR = r"/mount/src/fpdragon/static/fpdragon.png"
 
 # Add this near the top of your script
@@ -226,7 +226,7 @@ if prompt := st.chat_input("Ask something about Frenpet:"):
     })
     
     # Display user message
-    with st.chat_message("user", avatar=st.image(USER_AVATAR)):
+    with st.chat_message("user", avatar=USER_AVATAR):
         st.markdown(prompt)
     
     # Get bot response
