@@ -14,6 +14,7 @@ co = cohere.Client(cohere_key)
 st.sidebar.image(r"cooldragons.png", use_column_width=True)
 # Raw documents
 raw_documents = [
+    {"title": "Blockchainfaq5", "url": "https://pastebin.com/ft671e4W"},
     {"title": "Blockchainfaq4", "url": "https://docs.base.org/docs/differences"},
     {"title": "Blockchainfaq3", "url": "https://docs.base.org/docs/"},
     {"title": "Blockchainfaq2", "url": "https://consensys.io/knowledge-base/blockchain-super-faq#what-is-ethereum"},
