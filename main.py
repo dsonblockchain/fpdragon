@@ -113,77 +113,74 @@ def run_chatbot(message, chat_history=None):
     if chat_history is None:
         chat_history = []
 
-    # Format chat history for Cohere API
-    cohere_chat_history = [
-        {"role": str(entry["role"]), "message": str(entry["content"])}
-        for entry in chat_history
-        if isinstance(entry, dict) and "role" in entry and "content" in entry
-    ]
-
     try:
-        # Generate search queries
-        response = co.chat(
-            message=message,
-            model="command-r-plus",
-            search_queries_only=True,
-            chat_history=cohere_chat_history  # Use properly formatted history
-        )
+        # Format chat history for Cohere API
+        cohere_chat_history = [
+            {"role": str(entry["role"]), "message": str(entry["content"])}
+            for entry in chat_history
+            if isinstance(entry, dict) and "role" in entry and "content" in entry
+        ]
 
-        search_queries = []
-        for query in response.search_queries:
-            search_queries.append(query.text)
+        # Attempt to generate search queries
+        try:
+            response = co.chat(
+                message=message,
+                model="command-r-plus",
+                search_queries_only=True,
+                chat_history=cohere_chat_history,
+            )
+        except cohere.errors.TooManyRequestsError:
+            st.error(
+                "The chatbot has reached its monthly API limit. Please try again later or contact support."
+            )
+            return "The chatbot is temporarily unavailable due to API limits.", chat_history
+        except Exception as e:
+            st.error("An error occurred while generating queries. Please try again later.")
+            return "An error occurred while processing your request.", chat_history
+
+        search_queries = [query.text for query in response.search_queries]
 
         # If there are search queries, retrieve the documents
+        documents = []
         if search_queries:
-            print("Retrieving information...", end="")  # Optional print for debugging
-            documents = []
             for query in search_queries:
-                documents.extend(vectorstore.retrieve(query))
+                try:
+                    documents.extend(vectorstore.retrieve(query))
+                except Exception:
+                    st.warning(f"An issue occurred while retrieving documents for query: {query}")
+                    continue  # Continue retrieving other queries
 
-            # Use document chunks to respond
+        # Generate a response using retrieved documents or chat history
+        try:
             response = co.chat_stream(
                 message=message,
                 model="command-r-plus",
-                documents=documents,
+                documents=documents if documents else None,
                 chat_history=cohere_chat_history,
             )
-        else:
-            response = co.chat_stream(
-                message=message,
-                model="command-r-plus",
-                chat_history=cohere_chat_history,
+        except cohere.errors.TooManyRequestsError:
+            st.error(
+                "The chatbot has reached its monthly API limit. Please try again later or contact support."
             )
+            return "The chatbot is temporarily unavailable due to API limits.", chat_history
+        except Exception as e:
+            st.error("An error occurred while generating the response. Please try again later.")
+            return "An error occurred while processing your request.", chat_history
 
-        # Print the chatbot response, citations, and documents
+        # Process the chatbot response
         chatbot_response = ""
-        print("\nChatbot:")  # Optional print for debugging
         for event in response:
             if event.event_type == "text-generation":
-                print(event.text, end="")
                 chatbot_response += event.text
             if event.event_type == "stream-end":
-                if event.response.citations:
-                    print("\n\nCITATIONS:")
-                    for citation in event.response.citations:
-                        print(citation)
-                if event.response.documents:
-                    print("\nCITED DOCUMENTS:")
-                    for document in event.response.documents:
-                        print(document)
-                # Update the chat history for the next turn
+                # Update chat history
                 chat_history = event.response.chat_history
 
-        return chatbot_response, chat_history  # Return both the response and updated chat history
-
-    except cohere.errors.TooManyRequestsError:
-        st.error(
-            "The chatbot has reached its monthly API limit. Please try again later or contact support."
-        )
-        return "The chatbot is temporarily unavailable due to API limits.", chat_history
+        return chatbot_response, chat_history
 
     except Exception as e:
-        st.error("An unexpected error occurred. Please try again later.")
-        return "An error occurred while processing your request.", chat_history
+        st.error("A critical error occurred. Please try again later.")
+        return "An unexpected error occurred.", chat_history
 
 
 # Initialize session state for documents and vectorstore
