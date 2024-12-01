@@ -207,48 +207,52 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Streamlit app layout (Updated to resemble ChatGPT UI)
-st.title("FP Dragon Chat")
+under_construction = True  # Set this to False to enable the main app
 
-# Initialize chat history in session state
-if 'chat_history' not in st.session_state:
-    st.session_state.chat_history = []
+# Check the flag and render the appropriate content
+if under_construction:
+    st.title("Under Construction")
+else:
+    # Streamlit app layout (Updated to resemble ChatGPT UI)
+    st.title("FP Dragon Chat")
 
-# Display chat history
-for message in st.session_state.chat_history:
-    if isinstance(message, dict) and "role" in message and "content" in message:
-        avatar = BOT_AVATAR if message["role"] == "assistant" else USER_AVATAR
-        with st.chat_message(str(message["role"]), avatar=avatar):
-            st.markdown(f'<div class="{message["role"]}">{str(message["content"])}</div>', 
-                       unsafe_allow_html=True)
+    # Initialize chat history in session state
+    if 'chat_history' not in st.session_state:
+        st.session_state.chat_history = []
 
-# Handle user input
-if prompt := st.chat_input("Ask something about Frenpet:"):
-    # Add user message to chat history
-    st.session_state.chat_history.append({
-        "role": "user",
-        "content": prompt
-    })
-    
-    # Display user message
-    with st.chat_message("user", avatar=None):
-        st.markdown(prompt)
-    
-    # Get bot response
-    with st.chat_message("assistant", avatar=None):
-        chatbot_response, updated_history = run_chatbot(
-            prompt, 
-            st.session_state.chat_history
-        )
-        st.markdown(chatbot_response)
-        
-        # Update chat history
-        st.session_state.chat_history = updated_history
+    # Display chat history
+    for message in st.session_state.chat_history:
+        if isinstance(message, dict) and "role" in message and "content" in message:
+            avatar = BOT_AVATAR if message["role"] == "assistant" else USER_AVATAR
+            with st.chat_message(str(message["role"]), avatar=avatar):
+                st.markdown(f'<div class="{message["role"]}">{str(message["content"])}</div>', 
+                           unsafe_allow_html=True)
 
+    # Handle user input
+    if prompt := st.chat_input("Ask something about Frenpet:"):
+        # Add user message to chat history
+        st.session_state.chat_history.append({
+            "role": "user",
+            "content": prompt
+        })
 
+        # Display user message
+        with st.chat_message("user", avatar=None):
+            st.markdown(prompt)
 
-st.sidebar.image(r"cooldragons.png", use_column_width=True)
-st.sidebar.image(r"cooldragons.png", use_column_width=True)
-st.sidebar.image(r"cooldragons.png", use_column_width=True)
+        # Get bot response
+        with st.chat_message("assistant", avatar=None):
+            chatbot_response, updated_history = run_chatbot(
+                prompt, 
+                st.session_state.chat_history
+            )
+            st.markdown(chatbot_response)
 
+            # Update chat history
+            st.session_state.chat_history = updated_history
+
+    # Sidebar with repeated images
+    st.sidebar.image(r"cooldragons.png", use_column_width=True)
+    st.sidebar.image(r"cooldragons.png", use_column_width=True)
+    st.sidebar.image(r"cooldragons.png", use_column_width=True)
 
