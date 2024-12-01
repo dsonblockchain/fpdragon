@@ -2,6 +2,7 @@ import streamlit as st
 import cohere
 import uuid
 import hnswlib
+import time
 from typing import List, Dict
 from unstructured.partition.html import partition_html
 from unstructured.chunking.title import chunk_by_title
