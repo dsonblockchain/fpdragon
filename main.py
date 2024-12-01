@@ -62,33 +62,33 @@ class Vectorstore:
                         "url": raw_document["url"],
                     }
                 )
-
-def embed(self) -> None:
-    print("Embedding document chunks...")
-    batch_size = 50  # Reduce batch size
-    self.docs_len = len(self.docs)
-    for i in range(0, self.docs_len, batch_size):
-        batch = self.docs[i: min(i + batch_size, self.docs_len)]
-        texts = [item["text"] for item in batch]
-
-        # Retry logic with exponential backoff
-        for attempt in range(5):  # Max 5 retries
-            try:
-                docs_embs_batch = co.embed(
-                    texts=texts, model="embed-english-v3.0", input_type="search_document"
-                ).embeddings
-                self.docs_embs.extend(docs_embs_batch)
-                break  # Exit retry loop if successful
-            except cohere.errors.TooManyRequestsError as e:
-                if attempt < 4:
-                    st.warning(f"Rate limit hit. Retrying in {2**attempt} seconds...")
-                    time.sleep(2**attempt)  # Backoff (2, 4, 8, 16 seconds)
-                else:
-                    st.error("API rate limit exceeded. Could not embed documents.")
+    
+    def embed(self) -> None:
+        print("Embedding document chunks...")
+        batch_size = 50  # Reduce batch size
+        self.docs_len = len(self.docs)
+        for i in range(0, self.docs_len, batch_size):
+            batch = self.docs[i: min(i + batch_size, self.docs_len)]
+            texts = [item["text"] for item in batch]
+    
+            # Retry logic with exponential backoff
+            for attempt in range(5):  # Max 5 retries
+                try:
+                    docs_embs_batch = co.embed(
+                        texts=texts, model="embed-english-v3.0", input_type="search_document"
+                    ).embeddings
+                    self.docs_embs.extend(docs_embs_batch)
+                    break  # Exit retry loop if successful
+                except cohere.errors.TooManyRequestsError as e:
+                    if attempt < 4:
+                        st.warning(f"Rate limit hit. Retrying in {2**attempt} seconds...")
+                        time.sleep(2**attempt)  # Backoff (2, 4, 8, 16 seconds)
+                    else:
+                        st.error("API rate limit exceeded. Could not embed documents.")
+                        return
+                except Exception as e:
+                    st.error(f"Unexpected error: {e}")
                     return
-            except Exception as e:
-                st.error(f"Unexpected error: {e}")
-                return
 
 
     def index(self) -> None:
