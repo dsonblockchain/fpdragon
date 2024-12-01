@@ -108,70 +108,83 @@ class Vectorstore:
         return docs_retrieved
 
 # Function to run the chatbot
+# Function to run the chatbot
 def run_chatbot(message, chat_history=None):
     if chat_history is None:
         chat_history = []
-    
+
     # Format chat history for Cohere API
     cohere_chat_history = [
         {"role": str(entry["role"]), "message": str(entry["content"])}
         for entry in chat_history
         if isinstance(entry, dict) and "role" in entry and "content" in entry
     ]
-    
-    # Generate search queries
-    response = co.chat(
-        message=message,
-        model="command-r-plus",
-        search_queries_only=True,
-        chat_history=cohere_chat_history  # Use properly formatted history
-    )
-    
-    search_queries = []
-    for query in response.search_queries:
-        search_queries.append(query.text)
 
-    # If there are search queries, retrieve the documents
-    if search_queries:
-        print("Retrieving information...", end="")  # Optional print for debugging
-        documents = []
-        for query in search_queries:
-            documents.extend(vectorstore.retrieve(query))
-
-        # Use document chunks to respond
-        response = co.chat_stream(
+    try:
+        # Generate search queries
+        response = co.chat(
             message=message,
             model="command-r-plus",
-            documents=documents,
-            chat_history=cohere_chat_history,
+            search_queries_only=True,
+            chat_history=cohere_chat_history  # Use properly formatted history
         )
-    else:
-        response = co.chat_stream(
-            message=message,
-            model="command-r-plus",
-            chat_history=cohere_chat_history,
-        )
-        
-    # Print the chatbot response, citations, and documents
-    chatbot_response = ""
-    print("\nChatbot:")  # Optional print for debugging
-    for event in response:
-        if event.event_type == "text-generation":
-            print(event.text, end="")
-            chatbot_response += event.text
-        if event.event_type == "stream-end":
-            if event.response.citations:
-                print("\n\nCITATIONS:")
-                for citation in event.response.citations:
-                    print(citation)
-            if event.response.documents:
-                print("\nCITED DOCUMENTS:")
-                for document in event.response.documents:
-                    print(document)
-            # Update the chat history for the next turn
-            chat_history = event.response.chat_history
 
-    return chatbot_response, chat_history  # Return both the response and updated chat history
+        search_queries = []
+        for query in response.search_queries:
+            search_queries.append(query.text)
+
+        # If there are search queries, retrieve the documents
+        if search_queries:
+            print("Retrieving information...", end="")  # Optional print for debugging
+            documents = []
+            for query in search_queries:
+                documents.extend(vectorstore.retrieve(query))
+
+            # Use document chunks to respond
+            response = co.chat_stream(
+                message=message,
+                model="command-r-plus",
+                documents=documents,
+                chat_history=cohere_chat_history,
+            )
+        else:
+            response = co.chat_stream(
+                message=message,
+                model="command-r-plus",
+                chat_history=cohere_chat_history,
+            )
+
+        # Print the chatbot response, citations, and documents
+        chatbot_response = ""
+        print("\nChatbot:")  # Optional print for debugging
+        for event in response:
+            if event.event_type == "text-generation":
+                print(event.text, end="")
+                chatbot_response += event.text
+            if event.event_type == "stream-end":
+                if event.response.citations:
+                    print("\n\nCITATIONS:")
+                    for citation in event.response.citations:
+                        print(citation)
+                if event.response.documents:
+                    print("\nCITED DOCUMENTS:")
+                    for document in event.response.documents:
+                        print(document)
+                # Update the chat history for the next turn
+                chat_history = event.response.chat_history
+
+        return chatbot_response, chat_history  # Return both the response and updated chat history
+
+    except cohere.errors.TooManyRequestsError:
+        st.error(
+            "The chatbot has reached its monthly API limit. Please try again later or contact support."
+        )
+        return "The chatbot is temporarily unavailable due to API limits.", chat_history
+
+    except Exception as e:
+        st.error("An unexpected error occurred. Please try again later.")
+        return "An error occurred while processing your request.", chat_history
+
 
 # Initialize session state for documents and vectorstore
 if 'vectorstore' not in st.session_state:
