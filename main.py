@@ -46,9 +46,15 @@ class Vectorstore:
         self.docs_embs = []
         self.retrieve_top_k = 10
         self.rerank_top_k = 3
-        self.load_and_chunk()
-        self.embed()
-        self.index()
+
+        try:
+            self.load_and_chunk()
+            self.embed()
+            self.index()
+        except cohere.errors.TooManyRequestsError:
+            st.session_state.rate_limit_exceeded = True  # Set a flag in session state
+        except Exception as e:
+            st.error(f"An error occurred: {str(e)}")
 
     def load_and_chunk(self) -> None:
         print("Loading documents...")
@@ -66,31 +72,20 @@ class Vectorstore:
     
     def embed(self) -> None:
         print("Embedding document chunks...")
-        batch_size = 50  # Reduce batch size
+        batch_size = 90
         self.docs_len = len(self.docs)
+
         for i in range(0, self.docs_len, batch_size):
             batch = self.docs[i: min(i + batch_size, self.docs_len)]
             texts = [item["text"] for item in batch]
-    
-            # Retry logic with exponential backoff
-            for attempt in range(5):  # Max 5 retries
-                try:
-                    docs_embs_batch = co.embed(
-                        texts=texts, model="embed-english-v3.0", input_type="search_document"
-                    ).embeddings
-                    self.docs_embs.extend(docs_embs_batch)
-                    break  # Exit retry loop if successful
-                except cohere.errors.TooManyRequestsError as e:
-                    if attempt < 4:
-                        st.warning(f"Rate limit hit. Retrying in {2**attempt} seconds...")
-                        time.sleep(2**attempt)  # Backoff (2, 4, 8, 16 seconds)
-                    else:
-                        st.error("API rate limit exceeded. Could not embed documents.")
-                        return
-                except Exception as e:
-                    st.error(f"Unexpected error: {e}")
-                    return
 
+            try:
+                docs_embs_batch = co.embed(
+                    texts=texts, model="embed-english-v3.0", input_type="search_document"
+                ).embeddings
+                self.docs_embs.extend(docs_embs_batch)
+            except cohere.errors.TooManyRequestsError as e:
+                raise e  # Propagate rate limit error
 
     def index(self) -> None:
         print("Indexing document chunks...")
